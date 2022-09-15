@@ -5,11 +5,17 @@ import 'package:web_view/controller.dart';
 
 void main(List<String> args) {
   WidgetsFlutterBinding.ensureInitialized();
-  runApp(App());
+  runApp(const App());
 }
 
-class App extends StatelessWidget {
-  App({super.key});
+class App extends StatefulWidget {
+  const App({super.key});
+
+  @override
+  State<App> createState() => _AppState();
+}
+
+class _AppState extends State<App> {
   final Controller _controller = Get.put(Controller());
 
   @override
@@ -19,40 +25,31 @@ class App extends StatelessWidget {
       title: 'API',
       home: Scaffold(
         appBar: AppBar(
-          title: const Text(
-            'Questions & Answers',
-            style: TextStyle(
-              color: Colors.blueGrey,
-              fontSize: 40,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
+          centerTitle: true,
+          title: const Text('Assesment'),
         ),
-        backgroundColor: Colors.black,
         body: FutureBuilder(
           future: _controller.fetchQuestions(),
           builder: (context, snapshot) {
-            if (!snapshot.hasData) {
-              return Obx(
-                () => Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: ListView.builder(
-                    itemCount: _controller.questionList.length,
-                    itemBuilder: (context, index) {
-                      return Card(
-                        child: ListTile(
-                          trailing: const Text('data'),
-                          leading: Text(_controller
-                              .questionList[index].api[index].question),
-                        ),
-                      );
-                    },
-                  ),
-                ),
-              );
-            }
-            throw Exception('Something went wrong');
+          if (!snapshot.hasData) {
+            return ListView.builder(
+                itemCount: _controller.questionList.length,
+                itemBuilder: (context, index) {
+                  return ListTile(
+                    // subtitle: Text(_controller.questionList.values.elementAt(index).toString()),
+                    title: Text(_controller.questionList.keys.elementAt(index).toString()),
+                  );
+                });
+          } else {
+            return const Center(child: CircularProgressIndicator());
+          }
+        }),
+        floatingActionButton: FloatingActionButton(
+          onPressed: () {
+            _controller.fetchQuestions();
+            setState(() {});
           },
+          child: const Icon(Icons.add),
         ),
       ),
     );
